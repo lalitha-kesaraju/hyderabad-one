@@ -3,7 +3,7 @@
    PWA opens offline; every fetch is NETWORK-FIRST so content is never
    cache-locked, and cross-origin requests — OpenStreetMap/Leaflet map tiles
    above all — are never cached at all, only fetched live. */
-const CACHE = 'hyderabad-one-v6';
+const CACHE = 'deccango-v7';
 const SHELL = [
   './',
   './index.html',
