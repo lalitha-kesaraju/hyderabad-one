@@ -555,19 +555,47 @@ function renderTickets(){
   if(!tickets.length){el.innerHTML='<div class="empty"><div class="big">🎟️</div><span class="sticker rot-l" style="margin-bottom:10px">'+t('stk1')+'</span><h3 style="font-family:Bricolage Grotesque;color:var(--ink);margin-top:12px">No tickets yet</h3><p>'+t('emptyT')+'</p><button class="cta" style="max-width:220px" onclick="document.querySelector(\'[data-nav=plan]\').click()">Plan a journey →</button></div>';return}
   el.innerHTML=tickets.map(function(t){
     if(t.kind==='pass')return '<div class="ticket" style="background:linear-gradient(150deg,#7c2d4e,#ff4d8d)"><span class="pill live" style="background:#ffffff33;color:#fff">DEMO PASS</span><div class="fromto" style="margin-top:8px">'+t.title+'</div><p style="margin:2px 0;opacity:.85;font-size:.84rem">Holder: '+t.holder+' · Valid: '+t.valid+'</p><div class="qr">'+qrHTML(t.title+t.holder)+'</div><p style="text-align:center;margin:0;font-size:.74rem;opacity:.8;font-family:JetBrains Mono,monospace">HYD1 · DEMO · NOT VALID FOR TRAVEL</p></div>';
-    return '<div class="ticket"><span class="pill live" style="background:#ffffff33;color:#fff">DEMO · ONE QR</span><div class="fromto" style="margin-top:8px">'+t.from+' → '+t.to+'</div><p style="margin:2px 0;opacity:.85;font-size:.84rem">'+t.mins+' min · '+t.modes+' · ₹'+t.fare+' paid via UPI (demo)</p><div class="qr">'+qrHTML(t.from+t.to+t.mins+t.fare)+'</div><p style="text-align:center;margin:0;font-size:.74rem;opacity:.8;font-family:JetBrains Mono,monospace">ONE QR COVERS THE WHOLE JOURNEY</p></div>'}).join('');
+    return '<div class="ticket"><span class="pill live" style="background:#ffffff33;color:#fff">DEMO · ONE QR · ✓ ACTIVE</span><div class="fromto" style="margin-top:8px">'+t.from+' → '+t.to+'</div><p style="margin:2px 0;opacity:.85;font-size:.84rem">'+t.mins+' min · '+t.modes+' · ₹'+t.fare+' paid via UPI (demo)</p><div class="qr">'+qrHTML(t.from+t.to+t.mins+t.fare)+'</div><p style="text-align:center;margin:0;font-size:.74rem;opacity:.8;font-family:JetBrains Mono,monospace">ONE QR COVERS THE WHOLE JOURNEY</p></div>'}).join('');
 }
 renderTickets();
 /* ---------- Sheet / checkout ---------- */
 function openSheet(html){$('sheetIn').innerHTML=html;$('sheet').classList.add('open')}
 function closeSheet(){$('sheet').classList.remove('open')}
 $('sheet').addEventListener('click',function(e){if(e.target===$('sheet'))closeSheet()});
+/* ---------- Demo payment step : Pay screen -> processing -> QR activates ---------- */
+function demoPay(amount,label,onSuccess){
+  var amt='₹'+Number(amount).toLocaleString('en-IN');
+  var methods=[['GPay','Google Pay'],['PhonePe','PhonePe'],['Paytm','Paytm UPI'],['BHIM','BHIM UPI']];
+  var sel=0;
+  function payScreen(){
+    openSheet('<style>@keyframes h1spin{to{transform:rotate(360deg)}}@keyframes h1pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}</style>'
+    +'<div style="background:#fff7ed;border:1.5px dashed #ea580c;color:#9a3412;border-radius:12px;padding:8px 12px;font-weight:800;font-size:.8rem;text-align:center;margin-bottom:12px">🧪 DEMO PAYMENT — NO REAL MONEY MOVES</div>'
+    +'<h3 style="margin:0 0 2px">Pay '+amt+'</h3><p style="margin:0 0 4px;color:var(--muted);font-size:.88rem">'+label+'</p>'
+    +'<p style="margin:0 0 12px;font-size:.8rem;color:var(--muted)">To: Hyderabad One · TGSRTC / HMRL (demo) · via UPI</p>'
+    + methods.map(function(m,i){return '<button class="menurow" style="margin:0 0 9px;width:100%" data-upi="'+i+'"><span>'+(i===sel?'🔘 ':'⚪ ')+m[0]+' <small style="color:var(--muted)">'+m[1]+'</small></span><span>›</span></button>'}).join('')
+    +'<button class="cta" id="doPay">Pay '+amt+' (Demo)</button>'
+    +'<p class="note">In the live pilot, this step runs on the real UPI gateway of TGSRTC / HMRL — the QR ticket activates only after payment succeeds.</p>');
+    document.querySelectorAll('[data-upi]').forEach(function(b){b.addEventListener('click',function(){sel=+b.getAttribute('data-upi');payScreen()})});
+    $('doPay').addEventListener('click',function(){
+      openSheet('<div style="text-align:center;padding:26px 8px 14px"><div style="width:54px;height:54px;margin:0 auto 16px;border-radius:50%;border:5px solid #e9e4ff;border-top-color:var(--violet);animation:h1spin .8s linear infinite"></div><h3 style="margin:0 0 6px">Processing payment…</h3><p style="margin:0;color:var(--muted);font-size:.88rem" id="payStep">Contacting your bank (demo)…</p></div>');
+      var steps=['Contacting your bank (demo)…','Confirming with UPI switch (demo)…','Payment confirmed — activating your QR…'];
+      var i=0;var iv=setInterval(function(){i++;if(i<steps.length){var s=$('payStep');if(s)s.textContent=steps[i]}},750);
+      setTimeout(function(){clearInterval(iv);
+        openSheet('<div style="text-align:center;padding:22px 8px 10px"><div style="width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:#16a34a;color:#fff;font-size:2rem;display:flex;align-items:center;justify-content:center;animation:h1pop .45s ease">✓</div><h3 style="margin:0 0 6px">Payment successful (demo)</h3><p style="margin:0;color:var(--muted);font-size:.9rem">'+amt+' · '+methods[sel][0]+' UPI · Txn DEMO'+Math.floor(100000+Math.random()*899999)+'</p><p style="margin:10px 0 0;font-weight:800;color:#166534">🎫 Your QR ticket is now ACTIVE</p></div>');
+        setTimeout(function(){onSuccess()},1200);
+      },2300);
+    });
+  }
+  payScreen();
+}
 function checkoutJourney(r){
   var rows=r.legs.map(function(l){return '<div class="frow"><span>'+MEMOJI[l.mode]+' '+l.line+'<br/><small style="color:var(--muted)">'+l.from+' → '+l.to+'</small></span><b>₹'+l.fare+'</b></div>'}).join('');
   openSheet('<h3>One ticket, whole journey</h3><p style="margin:0 0 6px;color:var(--muted);font-size:.88rem">'+r.from+' → '+r.to+' · '+r.mins+' min · '+(r.changes===0?'Direct':r.changes+' change(s)')+'</p>'+rows+'<div class="frow"><span>Platform fee</span><b>₹0</b></div><div class="frow total"><span>Total (UPI)</span><span>₹'+r.fare+'</span></div><button class="cta" id="payBtn">Pay ₹'+r.fare+' &amp; get One QR →</button><p class="note">Demo checkout — no real payment. Fares are prototype estimates.</p>');
   $('payBtn').addEventListener('click',function(){
-    tickets.unshift({kind:'journey',from:r.from,to:r.to,mins:r.mins,fare:r.fare,modes:r.legs.map(function(l){return l.mode}).join(' + ')});
-    closeSheet();renderTickets();go('tickets');toast('🎫 One-QR ticket added to My Tickets');
+    demoPay(r.fare,r.from+' → '+r.to+' · One QR ticket',function(){
+      tickets.unshift({kind:'journey',from:r.from,to:r.to,mins:r.mins,fare:r.fare,modes:r.legs.map(function(l){return l.mode}).join(' + ')});
+      closeSheet();renderTickets();go('tickets');toast('🎫 Payment done (demo) — QR ticket ACTIVE in My Tickets');
+    });
   });
 }
 var sortBy='time',curRoutes=[],selRoute=0;
@@ -646,10 +674,12 @@ document.querySelectorAll('[data-buy-pass]').forEach(function(b){b.addEventListe
   var p=b.getAttribute('data-buy-pass').split('|');
   openSheet('<h3>'+p[0]+'</h3><p style="margin:0;color:var(--muted);font-size:.88rem">Unlimited Metro + City Bus · valid '+p[2]+'</p><div class="frow" style="margin-top:8px"><span>Pass price</span><b>₹'+Number(p[1]).toLocaleString('en-IN')+'</b></div><div class="frow"><span>Platform fee</span><b>₹0</b></div><div class="frow total"><span>Total (UPI)</span><span>₹'+Number(p[1]).toLocaleString('en-IN')+'</span></div><button class="cta" id="payPass">Pay &amp; activate pass →</button><p class="note">Demo checkout — no real payment is taken.</p>');
   $('payPass').addEventListener('click',function(){
-    tickets.unshift({kind:'pass',title:p[0],holder:'Rohith Kesaraju',valid:p[2]});
-    closeSheet();renderTickets();
-    $('myPass').innerHTML='<div style="margin:0 16px 12px"><span class="pill live">Active demo pass</span></div>';
-    go('tickets');toast('💳 '+p[0]+' activated — in My Tickets');
+    demoPay(Number(p[1]),p[0]+' · Common pass',function(){
+      tickets.unshift({kind:'pass',title:p[0],holder:'Rohith Kesaraju',valid:p[2]});
+      closeSheet();renderTickets();
+      $('myPass').innerHTML='<div style="margin:0 16px 12px"><span class="pill live">Active demo pass</span></div>';
+      go('tickets');toast('💳 Payment done (demo) — '+p[0]+' activated, in My Tickets');
+    });
   });
 })});
 /* ---------- Campus ---------- */
