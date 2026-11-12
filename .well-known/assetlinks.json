@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.satechnologies.hyderabadone",
+      "sha256_cert_fingerprints": [
+        "88:50:EC:85:4D:58:30:75:F2:6B:4C:C6:E3:7D:E3:DD:F0:19:D2:B4:6D:D4:F2:07:7A:4B:22:9B:7E:CD:93:FA"
+      ]
+    }
+  }
+]
