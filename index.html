@@ -308,6 +308,12 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(700px 
   <div id="ticketList" style="margin-top:18px"></div>
 </section>
 
+<!-- ============ OFFICER ============ -->
+<section class="screen" data-screen="officer">
+  <div class="topbar"><h2>Officer Dashboard</h2><p>Pilot view — what the department sees at the Week-4 review.</p></div>
+  <div id="officerBody" style="margin-top:18px"></div>
+</section>
+
 <!-- ============ PASS ============ -->
 <section class="screen" data-screen="pass">
   <div class="topbar"><h2>City Passes</h2><p>Metro + TGSRTC bus, unlimited. The Chennai One-style pass, Hyderabad edition.</p></div>
@@ -361,6 +367,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(700px 
   <div class="profile-head"><div class="avatar">RK</div><h3 style="font-family:'Bricolage Grotesque';margin:10px 0 0;font-size:1.3rem">Rohith Kesaraju</h3><p style="margin:2px 0 14px;color:var(--muted);font-size:.86rem">Hyderabad · Telugu / English / Hindi</p></div>
   <button class="menurow" data-goto="tickets"><span>🎫 My tickets &amp; passes</span><span>›</span></button>
   <button class="menurow" data-goto="campus"><span>🏢 Campus / IT Park mode</span><span>›</span></button>
+  <button class="menurow" data-goto="officer"><span>🏛️ Officer / Pilot dashboard</span><span>›</span></button>
   <button class="menurow" data-goto="pass"><span>💳 Saved payment — UPI</span><span>›</span></button>
   <button class="menurow" id="langRow"><span id="langRowLabel">🌐 Language — English</span><span>›</span></button>
   <button class="menurow" id="helpRow"><span>💬 Help &amp; support</span><span>›</span></button>
@@ -429,6 +436,7 @@ function go(name){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.toggle('active',s.getAttribute('data-screen')===name)});
   document.querySelectorAll('.navbtn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nav')===name)});
   viewport.scrollTop=0;
+  if(name==='officer')renderOfficer();
   if(name==='plan'&&typeof curRoutes!=='undefined'&&curRoutes.length){setTimeout(function(){var rm=$('routeMap');if(rm&&!rm.querySelector('canvas'))drawMap(curRoutes[selRoute])},80)}
 }
 document.querySelectorAll('[data-nav]').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-nav'))})});
@@ -440,7 +448,7 @@ $('modeCity').addEventListener('click',function(){go('home')});
 
 /* ---------- Network ---------- */
 var PLACES=["KPHB Colony","Miyapur","Hitech City","Gachibowli","Mehdipatnam","Ameerpet","Begumpet","Secunderabad","Koti / MGBS","Dilsukhnagar","LB Nagar","Habsiguda","Uppal","RGIA Airport"];
-var E=[["Miyapur","KPHB Colony","Metro","Metro Red Line",5,20],["KPHB Colony","Ameerpet","Metro","Metro Red Line",14,40],["Ameerpet","Koti / MGBS","Metro","Metro Red Line",16,45],["Koti / MGBS","Dilsukhnagar","Metro","Metro Red Line",14,40],["Dilsukhnagar","LB Nagar","Metro","Metro Red Line",6,20],["Hitech City","Ameerpet","Metro","Metro Blue Line",16,45],["Ameerpet","Begumpet","Metro","Metro Blue Line",5,20],["Begumpet","Secunderabad","Metro","Metro Blue Line",9,30],["Secunderabad","Habsiguda","Metro","Metro Blue Line",11,35],["Habsiguda","Uppal","Metro","Metro Blue Line",6,20],["Secunderabad","Koti / MGBS","Metro","Metro Green Line",18,40],["Secunderabad","Habsiguda","MMTS","MMTS",12,10],["Secunderabad","Hitech City","MMTS","MMTS via Begumpet",28,15],["Hitech City","Gachibowli","Bus","TGSRTC Bus 216",15,25],["Gachibowli","Mehdipatnam","Bus","TGSRTC Bus 216",22,30],["Mehdipatnam","Koti / MGBS","Bus","TGSRTC Bus 118",25,25],["Mehdipatnam","Ameerpet","Bus","TGSRTC Bus 5K",28,25],["KPHB Colony","Hitech City","Bus","TGSRTC Bus 10H",20,25],["KPHB Colony","Secunderabad","Bus","TGSRTC Bus 10",45,35],["Ameerpet","Secunderabad","Bus","TGSRTC Bus 16A",30,25],["Secunderabad","Uppal","Bus","TGSRTC Bus 3K",35,30],["Uppal","LB Nagar","Bus","TGSRTC Bus 18",20,20],["Dilsukhnagar","Habsiguda","Bus","TGSRTC Bus 113",30,25],["Koti / MGBS","RGIA Airport","Bus","TGSRTC Pushpak",55,300],["Hitech City","RGIA Airport","Bus","TGSRTC Pushpak",50,300],["Mehdipatnam","RGIA Airport","Bus","TGSRTC Pushpak",40,250],["Gachibowli","Hitech City","Bus","TGSRTC Bus 217",12,20],["Begumpet","Hitech City","Bus","TGSRTC Bus 10H",30,30]];
+var E=[["Miyapur","KPHB Colony","Metro","Metro Red Line",5,20],["KPHB Colony","Ameerpet","Metro","Metro Red Line",14,40],["Ameerpet","Koti / MGBS","Metro","Metro Red Line",16,45],["Koti / MGBS","Dilsukhnagar","Metro","Metro Red Line",14,40],["Dilsukhnagar","LB Nagar","Metro","Metro Red Line",6,20],["Hitech City","Ameerpet","Metro","Metro Blue Line",16,45],["Ameerpet","Begumpet","Metro","Metro Blue Line",5,20],["Begumpet","Secunderabad","Metro","Metro Blue Line",9,30],["Secunderabad","Habsiguda","Metro","Metro Blue Line",11,35],["Habsiguda","Uppal","Metro","Metro Blue Line",6,20],["Secunderabad","Koti / MGBS","Metro","Metro Green Line",18,40],["Secunderabad","Hitech City","MMTS","MMTS via Begumpet",28,15],["Hitech City","Gachibowli","Bus","TGSRTC Bus 216",15,25],["Gachibowli","Mehdipatnam","Bus","TGSRTC Bus 216",22,30],["Mehdipatnam","Koti / MGBS","Bus","TGSRTC Bus 118",25,25],["Mehdipatnam","Ameerpet","Bus","TGSRTC Bus 5K",28,25],["KPHB Colony","Hitech City","Bus","TGSRTC Bus 10H",20,25],["KPHB Colony","Secunderabad","Bus","TGSRTC Bus 10",45,35],["Ameerpet","Secunderabad","Bus","TGSRTC Bus 16A",30,25],["Secunderabad","Uppal","Bus","TGSRTC Bus 3K",35,30],["Uppal","LB Nagar","Bus","TGSRTC Bus 18",20,20],["Dilsukhnagar","Habsiguda","Bus","TGSRTC Bus 113",30,25],["Koti / MGBS","RGIA Airport","Bus","TGSRTC Pushpak",55,300],["Hitech City","RGIA Airport","Bus","TGSRTC Pushpak",50,300],["Mehdipatnam","RGIA Airport","Bus","TGSRTC Pushpak",40,250],["Gachibowli","Hitech City","Bus","TGSRTC Bus 217",12,20],["Begumpet","Hitech City","Bus","TGSRTC Bus 10H",30,30]];
 var ADJ={};PLACES.forEach(function(p){ADJ[p]=[]});
 E.forEach(function(e){ADJ[e[0]].push({to:e[1],mode:e[2],line:e[3],mins:e[4],fare:e[5]});ADJ[e[1]].push({to:e[0],mode:e[2],line:e[3],mins:e[4],fare:e[5]})});
 var MCOLOR={"Metro":"#3b82f6","MMTS":"#7c3aed","Bus":"#ff6b4a","Auto":"#ffb020"};
@@ -606,11 +614,42 @@ function checkoutJourney(r){
   openSheet('<h3>One ticket, whole journey</h3><p style="margin:0 0 6px;color:var(--muted);font-size:.88rem">'+r.from+' → '+r.to+' · '+r.mins+' min · '+(r.changes===0?'Direct':r.changes+' change(s)')+'</p>'+rows+'<div class="frow"><span>Platform fee</span><b>₹0</b></div><div class="frow total"><span>Total (UPI)</span><span>₹'+r.fare+'</span></div><button class="cta" id="payBtn">Pay ₹'+r.fare+' &amp; get One QR →</button><p class="note">Demo checkout — no real payment. Fares are prototype estimates.</p>');
   $('payBtn').addEventListener('click',function(){
     demoPay(r.fare,r.from+' → '+r.to+' · One QR ticket',function(){
-      tickets.unshift({kind:'journey',from:r.from,to:r.to,mins:r.mins,fare:r.fare,modes:r.legs.map(function(l){return l.mode}).join(' + ')});
+      statInc('tickets');tickets.unshift({kind:'journey',from:r.from,to:r.to,mins:r.mins,fare:r.fare,modes:r.legs.map(function(l){return l.mode}).join(' + ')});
       closeSheet();renderTickets();go('tickets');toast('🎫 Payment done (demo) — QR ticket ACTIVE in My Tickets');
     });
   });
 }
+/* ---------- Corridor depth: REAL station sequences (Hyderabad Metro / MMTS) ---------- */
+var LINE_ORDER={
+'Metro Red Line':['LB Nagar','Victoria Memorial','Chaitanya Puri','Dilsukhnagar','Moosarambagh','New Market','Malakpet','Koti / MGBS','Osmania Medical College','Gandhi Bhavan','Nampally','Assembly','Lakdikapul','Khairatabad','Punjagutta','Ameerpet','S.R. Nagar','ESI Hospital','Erragadda','Bharat Nagar','Moosapet','Dr. B.R. Ambedkar Balanagar','Kukatpally','KPHB Colony','JNTU College','Miyapur'],
+'Metro Blue Line':['Nagole','Uppal','Stadium','NGRI','Habsiguda','Tarnaka','Mettuguda','Secunderabad','Parade Ground','Paradise','Rasoolpura','Prakash Nagar','Begumpet','Ameerpet','Madhura Nagar','Yusufguda','Road No 5 Jubilee Hills','Jubilee Hills Check Post','Peddamma Gudi','Madhapur','Durgam Cheruvu','Hitech City','Raidurg'],
+'Metro Green Line':['JBS Parade Ground','Secunderabad','Gandhi Hospital','Musheerabad','RTC X Roads','Chikkadpally','Narayanguda','Sultan Bazaar','Koti / MGBS'],
+'MMTS via Begumpet':['Secunderabad','James Street','Sanjeevaiah Park','Necklace Road','Begumpet','Nature Cure Hospital','Fatehnagar','Borabanda','Hitech City'],
+'MMTS':['Secunderabad','James Street','Sanjeevaiah Park','Necklace Road','Begumpet','Nature Cure Hospital','Fatehnagar','Borabanda','Hitech City']
+};
+function stopsFor(l){var ord=LINE_ORDER[l.line];if(!ord)return[];var a=ord.indexOf(l.from),b=ord.indexOf(l.to);if(a<0||b<0||a===b)return[];var s=ord.slice(Math.min(a,b)+1,Math.max(a,b));return a<b?s:s.reverse()}
+function routeStops(r){return r.legs.reduce(function(n,l){return n+stopsFor(l).length},0)}
+var CORRIDOR=['KPHB Colony','Ameerpet','Secunderabad','Habsiguda'];
+function isCorridor(r){return CORRIDOR.indexOf(r.from)>-1&&CORRIDOR.indexOf(r.to)>-1}
+function shareText(r){return 'DeccanGo route: '+r.from+' \u2192 '+r.to+' \u00B7 '+r.mins+' min \u00B7 \u20B9'+r.fare+' \u00B7 '+r.legs.map(function(l){return l.line}).join(' + ')+' \u2014 try DeccanGo: https://lalitha-kesaraju.github.io/hyderabad-one/'}
+/* ---------- Usage stats (real, on-device) + Officer dashboard ---------- */
+function dgoStats(){try{return JSON.parse(localStorage.getItem('dgo_stats')||'{}')}catch(e){return{}}}
+function statSave(s){try{localStorage.setItem('dgo_stats',JSON.stringify(s))}catch(e){}}
+function statInc(k){var s=dgoStats();s[k]=(s[k]||0)+1;statSave(s)}
+function statPair(f,t){var s=dgoStats();s.plans=(s.plans||0)+1;s.pairs=s.pairs||{};var k=f+' \u2192 '+t;s.pairs[k]=(s.pairs[k]||0)+1;if(CORRIDOR.indexOf(f)>-1&&CORRIDOR.indexOf(t)>-1)s.corridor=(s.corridor||0)+1;statSave(s)}
+function officerCSV(){var s=dgoStats();var rows=[['metric','value'],['journey_plans',s.plans||0],['corridor_plans',s.corridor||0],['tickets_issued_demo',s.tickets||0],['passes_issued_demo',s.passes||0],['dost_questions',s.dost||0]];Object.keys(s.pairs||{}).forEach(function(k){rows.push(['pair: '+k,s.pairs[k]])});var csv=rows.map(function(r){return r.join(',')}).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='deccango-pilot-report.csv';document.body.appendChild(a);a.click();a.remove()}
+function renderOfficer(){var s=dgoStats();var plans=s.plans||0,corr=s.corridor||0;var share=plans?Math.round(corr*100/plans):0;
+  var pairs=Object.keys(s.pairs||{}).map(function(k){return [k,s.pairs[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,5);
+  $('officerBody').innerHTML='<div class="card" style="margin:0 16px 12px"><h4 style="margin:0 0 8px">\uD83D\uDCCA Pilot corridor \u2014 KPHB \u00B7 Ameerpet \u00B7 Secunderabad \u00B7 Habsiguda</h4>'
+  +'<div class="kv"><span>Journey plans (this device)</span><b>'+plans+'</b></div>'
+  +'<div class="kv"><span>Plans inside pilot corridor</span><b>'+corr+' ('+share+'%)</b></div>'
+  +'<div class="kv"><span>One-QR tickets issued (demo)</span><b>'+(s.tickets||0)+'</b></div>'
+  +'<div class="kv"><span>Passes issued (demo)</span><b>'+(s.passes||0)+'</b></div>'
+  +'<div class="kv"><span>Dost assistant questions</span><b>'+(s.dost||0)+'</b></div></div>'
+  +'<div class="card" style="margin:0 16px 12px"><h4 style="margin:0 0 8px">\uD83D\uDD1D Top routes searched</h4>'+(pairs.length?pairs.map(function(p){return '<div class="kv"><span>'+p[0]+'</span><b>'+p[1]+'</b></div>'}).join(''):'<p style="margin:0;color:var(--muted);font-size:.88rem">Inka searches avvaledu \u2014 Plan screen lo route chuste ikkada kanipistundi.</p>')+'</div>'
+  +'<div class="card" style="margin:0 16px 12px"><h4 style="margin:0 0 8px">\uD83D\uDDD3\uFE0F Week-4 review \u2014 ready template</h4><p style="margin:0 0 6px;font-size:.9rem">Week 1 demo &amp; data needs \u00B7 Week 2 pilot build with approved data \u00B7 Week 3 limited live trial \u00B7 Week 4 usage report (ee dashboard) &amp; go / no-go.</p><button class="cta" id="csvBtn" style="margin-top:6px">\u2B07\uFE0F Download report (CSV)</button></div>'
+  +'<p class="note" style="margin:0 16px">Honest note: counts are REAL usage on this device only, stored locally. In the live pilot, the same dashboard aggregates every user through the operator backend.</p>';
+  var cb=$('csvBtn');if(cb)cb.addEventListener('click',officerCSV)}
 var sortBy='time',curRoutes=[],selRoute=0;
 function badgesFor(r){
   if(!curRoutes.length)return '';
@@ -621,6 +660,7 @@ function badgesFor(r){
   if(r.mins===minM)b+='<span class="pill" style="background:#ffe4dc;color:#c2410c">'+t('prefFast')+'</span>';
   if(r.fare===minF)b+='<span class="pill" style="background:#dcfce7;color:#166534">'+t('prefCheap')+'</span>';
   if(r.changes===minC)b+='<span class="pill demo">'+t('prefFew')+'</span>';
+  if(isCorridor(r))b+='<span class="pill" style="background:#ede9fe;color:#5b21b6">🎯 Pilot corridor</span>';
   return b;
 }
 function bragFor(r){
@@ -674,7 +714,8 @@ function renderRoutes(){
     +'<div style="font-size:.84rem;font-weight:700;margin-top:2px">'+combo+'</div>'
     +'<div class="badges">'+badgesFor(r)+'</div>'
     +'<p style="margin:4px 0 0;font-size:.8rem;color:var(--muted)">'+(r.changes===0?'Direct · no changes':r.changes+' change'+(r.changes>1?'s':''))+' · one QR covers all legs · <span class="expandhint">details ▾</span></p>'
-    +'<div class="legs-detail">'+r.legs.map(function(l){return '<div class="leg"><i style="background:'+lineColor(l)+'"></i><div><p><b>'+l.mode+'</b> · '+l.from+' → '+l.to+'</p><small>'+l.line+' · '+l.mins+' min · ₹'+l.fare+'</small></div></div>'}).join('')
+    +'<div class="legs-detail">'+r.legs.map(function(l){return '<div class="leg"><i style="background:'+lineColor(l)+'"></i><div><p><b>'+l.mode+'</b> · '+l.from+' → '+l.to+'</p><small>'+l.line+' · '+l.mins+' min · ₹'+l.fare+'</small>'+(stopsFor(l).length?'<small style="display:block;margin-top:2px">🚏 via '+stopsFor(l).join(', ')+' ('+stopsFor(l).length+' stops)</small>':'')+'</div></div>'}).join('')
+    +'<a href="https://wa.me/?text='+encodeURIComponent(shareText(r))+'" target="_blank" rel="noopener" style="display:inline-block;margin:2px 0 8px;font-size:.84rem;font-weight:700;color:#128c4a;text-decoration:none">📲 WhatsApp lo share chey</a><br/>'
     +'<button class="buy" data-buyroute="'+idx+'">🎫 Get One-QR Ticket · ₹'+r.fare+'</button></div></div>';
   }).join('');
   res.querySelectorAll('[data-route]').forEach(function(card){
@@ -697,6 +738,7 @@ function plan(){
   if(!curRoutes.length){res.innerHTML='<p class="note">Brahmi face moment 😶 — ee pair ki inka prototype route ledu bava.</p>';$('sortRow').style.display='none';$('poiBox').innerHTML='';return}
   selRoute=0;
   $('sortRow').style.display='flex';
+  statPair(f,to);
   renderRoutes();
   drawMap(curRoutes[0]);
   var brag=bragFor(curRoutes[0]);var bImg=bragImg(curRoutes[0]);$('bragBox').innerHTML=brag?'<div class="brag" style="margin-top:12px">'+(bImg?'<img class="memeimg sm" style="float:left;margin:0 10px 4px 0" src="'+bImg+'">':'')+brag+'</div>':'';renderPOI(curRoutes[0]);
@@ -724,8 +766,8 @@ function dostRoute(a,b){var rs=allRoutes(a,b);
   if(!rs.length){dostBot('Aa pair ki inka prototype route ledu bava \uD83D\uDE36 Vere places try chey.');return}
   var f=rs.slice().sort(function(x,y){return x.mins-y.mins})[0];
   var ch=rs.slice().sort(function(x,y){return x.fare-y.fare})[0];
-  dostBot('<b>'+a+' \u2192 '+b+'</b> ki '+rs.length+' routes unnayi.<br>\u26A1 Fastest: <b>'+f.mins+' min \u00B7 \u20B9'+f.fare+'</b> \u2014 '+dostLegs(f)+(f.changes?' ('+f.changes+' change)':' (direct)')+'<br>\uD83D\uDCB0 Cheapest: <b>\u20B9'+ch.fare+' \u00B7 '+ch.mins+' min</b> \u2014 '+dostLegs(ch)+'<br><button class="dplan" data-dplan="'+a+'|'+b+'">Plan lo full ga chudu \u2192</button>')}
-function dostAsk(raw){var txt=raw.trim();if(!txt)return;dostAdd('me',txt.replace(/&/g,'&amp;').replace(/</g,'&lt;'));var low=txt.toLowerCase();var places=dostPlaces(txt);
+  dostBot('<b>'+a+' \u2192 '+b+'</b> ki '+rs.length+' routes unnayi.<br>\u26A1 Fastest: <b>'+f.mins+' min \u00B7 \u20B9'+f.fare+'</b> \u2014 '+dostLegs(f)+(f.changes?' ('+f.changes+' change)':' (direct)')+(routeStops(f)?' \u00B7 '+routeStops(f)+' via stops':'')+'<br>\uD83D\uDCB0 Cheapest: <b>\u20B9'+ch.fare+' \u00B7 '+ch.mins+' min</b> \u2014 '+dostLegs(ch)+'<br><button class="dplan" data-dplan="'+a+'|'+b+'">Plan lo full ga chudu \u2192</button>')}
+function dostAsk(raw){var txt=raw.trim();if(!txt)return;statInc('dost');dostAdd('me',txt.replace(/&/g,'&amp;').replace(/</g,'&lt;'));var low=txt.toLowerCase();var places=dostPlaces(txt);
   if(places.length>=2){dostFrom=null;dostRoute(places[0],places[1]);return}
   if(/pushpak/.test(low)||(/airport|rgia/.test(low)&&places.length<=1&&!dostFrom)){dostBot('✈️ <b>Pushpak airport buses:</b> AL route ~20 min ki okati (Uppal, LB Nagar via), AC route ~30 min (Mehdipatnam via), AA route ~1 hr (Nampally via) — JBS / Secunderabad nunchi RGIA ki. Fares ₹100 nunchi start (indicative). Nee place nunchi airport route kavali ante "Ameerpet to airport" ani adugu.');return}
   if(places.length===1){var p1=places[0];
@@ -742,8 +784,9 @@ function dostAsk(raw){var txt=raw.trim();if(!txt)return;dostAdd('me',txt.replace
   if(/who are you|nuvvu evaru|enti nuvvu|your name/.test(low)){dostBot('Nenu <b>Dost</b> \u2014 DeccanGo lopala guide ni. Nenu AI ni kadu; app lo unna data (routes, fares, passes, timings) nunchi matrame answers ista. Teliyandi telidu ane chepta.');return}
   if(/fare|price|cost|entha|charge/.test(low)){dostBot('Fare route batti untundi bava. Ekkada nunchi ekkadiki? Rendhu places cheppu \u2014 cheapest &amp; fastest rendu chepta.');return}
   dostBot('Adi naaku telidu bava \uD83D\uDE05 Nenu app data matrame cheppagalanu \u2014 <b>route, pass prices, metro timings, Mahalakshmi, airport bus</b> gurinchi adugu. Example: "Miyapur to Secunderabad"')}
-function openDost(){openSheet('<h3 style="margin-bottom:2px">\uD83E\uDD16 Dost \u2014 mee journey guide</h3><p style="margin:0 0 8px;color:var(--muted);font-size:.84rem">App data nunchi matrame answer ista. Fake mattalu cheppanu.</p><div id="dostMsgs" style="max-height:44vh;overflow-y:auto;padding:4px 2px"></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0"><button class="dchip" data-dchip="KPHB to Habsiguda route">\uD83D\uDEE3\uFE0F Route example</button><button class="dchip" data-dchip="Pass prices cheppu">\uD83D\uDCB3 Pass prices</button><button class="dchip" data-dchip="Mahalakshmi enti?">\uD83C\uDF38 Mahalakshmi</button><button class="dchip" data-dchip="Metro timings">\uD83D\uDE87 Timings</button><button class="dchip" data-dchip="Airport bus ela?">\u2708\uFE0F Airport bus</button></div><div style="display:flex;gap:8px"><input id="dostIn" type="text" placeholder="Adugu bava\u2026 e.g. Ameerpet to airport" style="flex:1;padding:11px 12px;border:1.5px solid #d9d2f2;border-radius:12px;font-family:inherit;font-size:.92rem"><button id="dostSend" style="background:#3b1d7a;color:#fff;border:none;border-radius:12px;padding:0 16px;font-weight:800;font-family:inherit;cursor:pointer">Send</button></div>');
+function openDost(){openSheet('<h3 style="margin-bottom:2px">\uD83E\uDD16 Dost \u2014 mee journey guide</h3><p style="margin:0 0 8px;color:var(--muted);font-size:.84rem">App data nunchi matrame answer ista. Fake mattalu cheppanu.</p><div id="dostMsgs" style="max-height:44vh;overflow-y:auto;padding:4px 2px"></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0"><button class="dchip" data-dchip="KPHB to Habsiguda route">\uD83D\uDEE3\uFE0F Route example</button><button class="dchip" data-dchip="Pass prices cheppu">\uD83D\uDCB3 Pass prices</button><button class="dchip" data-dchip="Mahalakshmi enti?">\uD83C\uDF38 Mahalakshmi</button><button class="dchip" data-dchip="Metro timings">\uD83D\uDE87 Timings</button><button class="dchip" data-dchip="Airport bus ela?">\u2708\uFE0F Airport bus</button></div><div style="display:flex;gap:8px"><input id="dostIn" type="text" placeholder="Adugu bava\u2026 e.g. Ameerpet to airport" style="flex:1;padding:11px 12px;border:1.5px solid #d9d2f2;border-radius:12px;font-family:inherit;font-size:.92rem"><button id="dostMic" style="background:#fff;border:1.5px solid #d9d2f2;border-radius:12px;padding:0 13px;font-size:1rem;cursor:pointer">🎤</button><button id="dostSend" style="background:#3b1d7a;color:#fff;border:none;border-radius:12px;padding:0 16px;font-weight:800;font-family:inherit;cursor:pointer">Send</button></div>');
   dostBot('Namaste bava! \uD83D\uDE4F Nenu <b>Dost</b>. Route, pass, timings \u2014 em kavali?');
+  var dmic=$('dostMic');if(dmic)dmic.addEventListener('click',function(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('🎤 Ee browser lo voice support ledu bava');return}var rec=new SR();rec.lang=(typeof REC_LANG!=='undefined'&&REC_LANG[LANG])||'te-IN';rec.interimResults=false;rec.onresult=function(ev){var tx=ev.results[0][0].transcript||'';if(tx){$('dostIn').value='';dostAsk(tx)}};rec.onerror=function(){toast('🎤 Voice catch avvaledu — malli try chey')};try{rec.start();toast('🎤 Cheppu bava… vintunna')}catch(e){}});
   $('dostSend').addEventListener('click',function(){var v=$('dostIn').value;$('dostIn').value='';dostAsk(v)});
   $('dostIn').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('dostSend').click()}});
   document.querySelectorAll('[data-dchip]').forEach(function(ch){ch.addEventListener('click',function(){dostAsk(ch.getAttribute('data-dchip'))})});
@@ -757,7 +800,7 @@ document.querySelectorAll('[data-buy-pass]').forEach(function(b){b.addEventListe
   openSheet('<h3>'+p[0]+'</h3><p style="margin:0;color:var(--muted);font-size:.88rem">Unlimited Metro + City Bus · valid '+p[2]+'</p><div class="frow" style="margin-top:8px"><span>Pass price</span><b>₹'+Number(p[1]).toLocaleString('en-IN')+'</b></div><div class="frow"><span>Platform fee</span><b>₹0</b></div><div class="frow total"><span>Total (UPI)</span><span>₹'+Number(p[1]).toLocaleString('en-IN')+'</span></div><button class="cta" id="payPass">Pay &amp; activate pass →</button><p class="note">Demo checkout — no real payment is taken.</p>');
   $('payPass').addEventListener('click',function(){
     demoPay(Number(p[1]),p[0]+' · Common pass',function(){
-      tickets.unshift({kind:'pass',title:p[0],holder:'Rohith Kesaraju',valid:p[2]});
+      statInc('passes');tickets.unshift({kind:'pass',title:p[0],holder:'Rohith Kesaraju',valid:p[2]});
       closeSheet();renderTickets();
       $('myPass').innerHTML='<div style="margin:0 16px 12px"><span class="pill live">Active demo pass</span></div>';
       go('tickets');toast('💳 '+p[0]+' activated — Jai Balayya! 🔥 (demo payment done)');
@@ -770,7 +813,7 @@ function renderShuttles(){var d=SH[$('shuttleSel').value];
   $('adminStats').innerHTML=[['🚌',d.fleet,' shuttles live'],['👥',d.riders,' riders today'],['⏱️',d.ontime+'%',' on-time']].map(function(s){return '<div class="card" style="padding:12px;text-align:center"><div style="font-size:1.1rem">'+s[0]+'</div><b style="font-family:Bricolage Grotesque">'+s[1]+'</b><div style="font-size:.7rem;color:var(--muted)">'+s[2]+'</div></div>'}).join('');
   $('shuttleBoard').innerHTML=d.buses.map(function(b){return '<div class="live-card"><div class="mode-dot" style="background:var(--violet)">'+b.no.split('-')[1]+'</div><div style="flex:1;min-width:0"><h4>'+b.no+' · '+b.route+'</h4><p>Next stop in '+b.eta+' · '+b.occ+'% full</p><div class="occ" style="margin-top:6px"><i style="width:'+b.occ+'%"></i></div></div></div>'}).join('')}
 $('shuttleSel').addEventListener('change',renderShuttles);renderShuttles();
-$('passBtn').addEventListener('click',function(){var n=$('passName').value.trim()||'Rohith Kesaraju';var inst=SH[$('shuttleSel').value].label;tickets.unshift({kind:'pass',title:inst+' Pass',holder:n,valid:'This semester / month'});renderTickets();go('tickets');toast('🎫 Institution pass issued for '+n)});
+$('passBtn').addEventListener('click',function(){var n=$('passName').value.trim()||'Rohith Kesaraju';var inst=SH[$('shuttleSel').value].label;statInc('passes');tickets.unshift({kind:'pass',title:inst+' Pass',holder:n,valid:'This semester / month'});renderTickets();go('tickets');toast('🎫 Institution pass issued for '+n)});
 $('langRow').addEventListener('click',function(){
   openSheet('<h3>🌐 Language / భాష / भाषा / زبان</h3><p style="margin:0 0 10px;color:var(--muted);font-size:.88rem">App motham nee basha loki marutadi.</p>'+[['en','English'],['te','తెలుగు'],['hi','हिन्दी'],['ur','اردو']].map(function(L){return '<button class="menurow" style="margin:0 0 9px;width:100%" data-setlang="'+L[0]+'"><span>'+L[1]+'</span><span>'+(LANG===L[0]?'✓':'›')+'</span></button>'}).join(''));
   document.querySelectorAll('[data-setlang]').forEach(function(b){b.addEventListener('click',function(){applyLang(b.getAttribute('data-setlang'));closeSheet();toast('🌐 '+t('langName'))})});
